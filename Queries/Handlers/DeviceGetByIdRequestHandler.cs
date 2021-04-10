@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace CQRSTest.Queries.Handlers
 {
-    public class DeviceGetByIdHandler<TResult> : IRequestHandler<DeviceGetByIdRequest<TResult>, TResult>
+    public class DeviceGetByIdRequestHandler<TResult> : IRequestHandler<DeviceGetByIdRequest<TResult>, TResult>
     {
         private readonly DatabaseContext _context;
 
-        public DeviceGetByIdHandler(DatabaseContext context)
+        public DeviceGetByIdRequestHandler(DatabaseContext context)
         {
             this._context = context;
         }

@@ -25,8 +25,7 @@ namespace CQRSTest
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddEntityFrameworkInMemoryDatabase()
-                        .AddDbContext<DatabaseContext>(options => options.UseInMemoryDatabase("CQRSTest")
-                                                                            .LogTo(log => Console.WriteLine(log)));
+                        .AddDbContext<DatabaseContext>(options => options.UseInMemoryDatabase("CQRSTest"));
 
             services.AddControllersWithViews();
             
@@ -34,7 +33,8 @@ namespace CQRSTest
             services.AddMediatR(typeof(Startup).Assembly);
 
             // Todo: Figure out if we can omit this... this sucks...
-            services.AddTransient(typeof(IRequestHandler<DeviceGetByIdRequest<SimpleDeviceViewModel>, SimpleDeviceViewModel>), typeof(DeviceGetByIdHandler<SimpleDeviceViewModel>));
+            // The default .NET DI container doesn't support the open generic in this implementation...
+            services.AddTransient(typeof(IRequestHandler<DeviceGetByIdRequest<SimpleDeviceViewModel>, SimpleDeviceViewModel>), typeof(DeviceGetByIdRequestHandler<SimpleDeviceViewModel>));
 
             // Init AutoMapper with expression mapping
             services.AddAutoMapper(cfg =>
