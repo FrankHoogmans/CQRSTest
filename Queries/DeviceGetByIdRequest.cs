@@ -1,16 +1,19 @@
 using AutoMapper;
 using MediatR;
 
-public class DeviceGetByIdRequest<TResult> : IRequest<TResult>
+public interface IRequestWithMapping<TResult> : IRequest<TResult>
+{
+    IConfigurationProvider Mapping { get; set; }
+}
+
+public class DeviceGetByIdRequest<TResult> : IRequestWithMapping<TResult>
 {
     public DeviceGetByIdRequest(
-        int id,
-        IConfigurationProvider mapping)
+        int id)
     {
         this.Id = id;
-        this.Mapping = mapping;
     }
 
     public int Id { get; }
-    public IConfigurationProvider Mapping { get; }
+    public IConfigurationProvider Mapping { get; set; }
 }

@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 
 namespace CQRSTest
 {
@@ -28,13 +27,14 @@ namespace CQRSTest
                         .AddDbContext<DatabaseContext>(options => options.UseInMemoryDatabase("CQRSTest"));
 
             services.AddControllersWithViews();
-            
+
             // Init MediatR
             services.AddMediatR(typeof(Startup).Assembly);
 
             // Todo: Figure out if we can omit this... this sucks...
             // The default .NET DI container doesn't support the open generic in this implementation...
             services.AddTransient(typeof(IRequestHandler<DeviceGetByIdRequest<SimpleDeviceViewModel>, SimpleDeviceViewModel>), typeof(DeviceGetByIdRequestHandler<SimpleDeviceViewModel>));
+            services.AddTransient<IModelWithMappingFactory, ModelWithMappingFactory>();
 
             // Init AutoMapper with expression mapping
             services.AddAutoMapper(cfg =>

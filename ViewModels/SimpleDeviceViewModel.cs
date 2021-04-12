@@ -1,15 +1,43 @@
+using System.Threading.Tasks;
 using AutoMapper;
 using MediatR;
-using System.Threading.Tasks;
 
-public record SimpleDeviceViewModel(int Id, string Name, string DeviceTypeName)
+public class SimpleDeviceViewModel : IModelWithMapping
 {
-    public static async Task<SimpleDeviceViewModel> Load(IMediator mediator, int id)
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string DeviceTypeName { get; set; }
+
+    public IConfigurationProvider GetMapping()
     {
-        var mapping = new MapperConfiguration(cfg =>
+        return new MapperConfiguration(cfg =>
             cfg.CreateMap<Device, SimpleDeviceViewModel>()
             .ForMember(dto => dto.DeviceTypeName, conf => conf.MapFrom(ol => ol.DeviceType.Name)));
+    }
+}
 
-        return await mediator.Send(new DeviceGetByIdRequest<SimpleDeviceViewModel>(id, mapping));
+public interface IModelWithMapping
+{
+    IConfigurationProvider GetMapping();
+}
+
+public interface IModelWithMappingFactory
+{
+    Task<T> Load<T>(IRequestWithMapping<T> request) where T : new();
+}
+
+public class ModelWithMappingFactory : IModelWithMappingFactory
+{
+    private readonly IMediator _mediator;
+
+    public ModelWithMappingFactory(IMediator mediator)
+    {
+        this._mediator = mediator;
+    }
+
+    public async Task<T> Load<T>(IRequestWithMapping<T> request) where T : new()
+    {
+        request.Mapping = ((IModelWithMapping)new T()).GetMapping();
+        return await this._mediator.Send(request);
     }
 }

@@ -1,27 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using CQRSTest.Models;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CQRSTest.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IModelWithMappingFactory _factory;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IModelWithMappingFactory factory)
         {
-            _logger = logger;
+            this._logger = logger;
+            this._factory = factory;
         }
 
-        public async Task<IActionResult> Index([FromServices]IMediator mediator)
+        public async Task<IActionResult> Index([FromServices] IMediator mediator)
         {
-            var viewModel = await SimpleDeviceViewModel.Load(mediator, 1);
+            var viewModel = await this._factory.Load(new DeviceGetByIdRequest<SimpleDeviceViewModel>(1));
+
+            //var viewModel = await SimpleDeviceViewModel.Load(mediator, 1);
             return View();
         }
 
