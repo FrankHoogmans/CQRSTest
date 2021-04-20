@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using CQRSTest.Models;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace CQRSTest.Controllers
 {
@@ -19,9 +16,10 @@ namespace CQRSTest.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index([FromServices]IMediator mediator)
+        public async Task<IActionResult> Index([FromServices] IMediator mediator)
         {
-            var viewModel = await SimpleDeviceViewModel.Load(mediator, 1);
+            //var viewModel = await SimpleDeviceViewModel.Load(mediator, 1);
+            var viewModel = await mediator.Send(new DeviceGetByIdRequest<SimpleDeviceViewModel>(1));
             return View();
         }
 

@@ -1,15 +1,19 @@
 using AutoMapper;
-using MediatR;
-using System.Threading.Tasks;
 
-public record SimpleDeviceViewModel(int Id, string Name, string DeviceTypeName)
+public class SimpleDeviceViewModel
 {
-    public static async Task<SimpleDeviceViewModel> Load(IMediator mediator, int id)
-    {
-        var mapping = new MapperConfiguration(cfg =>
-            cfg.CreateMap<Device, SimpleDeviceViewModel>()
-            .ForMember(dto => dto.DeviceTypeName, conf => conf.MapFrom(ol => ol.DeviceType.Name)));
+    public int Id { get; set; }
 
-        return await mediator.Send(new DeviceGetByIdRequest<SimpleDeviceViewModel>(id, mapping));
+    public string Name { get; set; }
+
+    public string DeviceTypeName { get; set; }
+}
+
+public class SimpleDeviceViewModelProfile : Profile
+{
+    public SimpleDeviceViewModelProfile()
+    {
+        CreateMap<Device, SimpleDeviceViewModel>()
+            .ForMember(dto => dto.DeviceTypeName, conf => conf.MapFrom(ol => ol.DeviceType.Name));
     }
 }

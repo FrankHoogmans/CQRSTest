@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 
 namespace CQRSTest
 {
@@ -28,7 +27,7 @@ namespace CQRSTest
                         .AddDbContext<DatabaseContext>(options => options.UseInMemoryDatabase("CQRSTest"));
 
             services.AddControllersWithViews();
-            
+
             // Init MediatR
             services.AddMediatR(typeof(Startup).Assembly);
 
@@ -40,6 +39,7 @@ namespace CQRSTest
             services.AddAutoMapper(cfg =>
             {
                 cfg.AddExpressionMapping();
+                cfg.AddMaps(typeof(Startup).Assembly);
             });
 
             // Init the database
