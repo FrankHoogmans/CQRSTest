@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.DataProtection;
 
 namespace CQRSTest.Data
 {
     public static class DatabaseInitializer
     {
-        public static void Initialize(DatabaseContext context)
+        public static void Initialize(DatabaseContext context, IDataProtectionProvider dataProtectionProvider)
         {
             var deviceType = new DeviceType
             {
-                Name = "The best device type"
+                Name = "The best device type",
+                FunctionalConfiguration = Configuration.Optional,
+                SecureContent = dataProtectionProvider.CreateProtector("Secure").Protect("Some secure text")
             };
             context.DeviceTypes.Add(deviceType);
 

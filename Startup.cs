@@ -1,14 +1,15 @@
 using AutoMapper.Extensions.ExpressionMapping;
+using CQRSTest.AutoMapper;
 using CQRSTest.Data;
 using CQRSTest.Queries.Handlers;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 
 namespace CQRSTest
 {
@@ -28,7 +29,9 @@ namespace CQRSTest
                         .AddDbContext<DatabaseContext>(options => options.UseInMemoryDatabase("CQRSTest"));
 
             services.AddControllersWithViews();
-            
+            services.AddDataProtection();
+            services.AddTransient<SecureValueConverter>();
+
             // Init MediatR
             services.AddMediatR(typeof(Startup).Assembly);
 
@@ -40,13 +43,15 @@ namespace CQRSTest
             services.AddAutoMapper(cfg =>
             {
                 cfg.AddExpressionMapping();
+                cfg.AddMaps(typeof(Startup).Assembly);
             });
 
             // Init the database
             using (var scope = services.BuildServiceProvider().CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                DatabaseInitializer.Initialize(context);
+                var dataprotectionProvider = scope.ServiceProvider.GetRequiredService<IDataProtectionProvider>();
+                DatabaseInitializer.Initialize(context, dataprotectionProvider);
             }
         }
 

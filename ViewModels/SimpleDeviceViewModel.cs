@@ -1,15 +1,31 @@
 using AutoMapper;
-using MediatR;
-using System.Threading.Tasks;
+using CQRSTest.AutoMapper;
 
-public record SimpleDeviceViewModel(int Id, string Name, string DeviceTypeName)
+public class SimpleDeviceViewModel
 {
-    public static async Task<SimpleDeviceViewModel> Load(IMediator mediator, int id)
-    {
-        var mapping = new MapperConfiguration(cfg =>
-            cfg.CreateMap<Device, SimpleDeviceViewModel>()
-            .ForMember(dto => dto.DeviceTypeName, conf => conf.MapFrom(ol => ol.DeviceType.Name)));
+    public int Id { get; set; }
 
-        return await mediator.Send(new DeviceGetByIdRequest<SimpleDeviceViewModel>(id, mapping));
+    public string Name { get; set; }
+
+    public string DeviceTypeName { get; set; }
+
+    public string SecureContent { get; set; }
+
+    public bool RequiresConfiguration { get; set; }
+}
+
+public class SimpleDeviceViewModelProfile : Profile
+{
+    public SimpleDeviceViewModelProfile()
+    {
+        CreateMap<Device, SimpleDeviceViewModel>()
+            .ForMember(dto => dto.DeviceTypeName, conf => conf.MapFrom(ol => ol.DeviceType.Name))
+            .ForMember(dto => dto.RequiresConfiguration, conf => conf.MapFrom(ol => ol.DeviceType.FunctionalConfiguration != Configuration.NotSupported || ol.DeviceType.TechnicalConfiguration != Configuration.NotSupported))
+            .ForMember(dto => dto.SecureContent, conf => conf.MapFrom(ol => ol.DeviceType.SecureContent));
+
+        // Decryption mapping, could also be used for doing translations on enums or whatever value conversions that are not supported in Expressions
+        CreateMap<SimpleDeviceViewModel, SimpleDeviceViewModel>()
+            .ForMember(dto => dto.SecureContent, conf => conf.ConvertUsing<SecureValueConverter, string>());
     }
 }
+
