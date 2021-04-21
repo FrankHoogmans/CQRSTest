@@ -1,4 +1,5 @@
 using AutoMapper.Extensions.ExpressionMapping;
+using CQRSTest.AutoMapper;
 using CQRSTest.Data;
 using CQRSTest.Queries.Handlers;
 using MediatR;
