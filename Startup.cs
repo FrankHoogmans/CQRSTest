@@ -3,6 +3,7 @@ using CQRSTest.Data;
 using CQRSTest.Queries.Handlers;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +28,8 @@ namespace CQRSTest
                         .AddDbContext<DatabaseContext>(options => options.UseInMemoryDatabase("CQRSTest"));
 
             services.AddControllersWithViews();
+            services.AddDataProtection();
+            services.AddTransient<SecureValueConverter>();
 
             // Init MediatR
             services.AddMediatR(typeof(Startup).Assembly);
@@ -46,7 +49,8 @@ namespace CQRSTest
             using (var scope = services.BuildServiceProvider().CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                DatabaseInitializer.Initialize(context);
+                var dataprotectionProvider = scope.ServiceProvider.GetRequiredService<IDataProtectionProvider>();
+                DatabaseInitializer.Initialize(context, dataprotectionProvider);
             }
         }
 

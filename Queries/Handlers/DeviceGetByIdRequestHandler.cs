@@ -28,8 +28,12 @@ namespace CQRSTest.Queries.Handlers
                             .Where(d => d.Id == request.Id);
 
             // Projection
-            return await this._mapper.ProjectTo<TResult>(deviceQuery)
+            var queryResult = await this._mapper.ProjectTo<TResult>(deviceQuery)
                                         .SingleOrDefaultAsync(cancellationToken);
+
+            // We Map here from TResult to TResult, to give a developer the option do do things that are not supported in Projections
+            // See: https://docs.automapper.org/en/stable/Queryable-Extensions.html#supported-mapping-options for items that should be in the TResult to TResult mapping instead of the projection
+            return this._mapper.Map<TResult, TResult>(queryResult);
         }
     }
 }
